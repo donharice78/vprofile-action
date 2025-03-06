@@ -7,6 +7,7 @@ env:
   AWS_REGION: us-east-1
   ECR_REPOSITORY: vprofileapp
   EKS_CLUSTER: vprofilefhat-eks
+  AWS_ACCOUNT_ID: <Your-AWS-Account-ID>  # Ensure you add your AWS account ID here
 
 jobs:
   Testing:
@@ -65,8 +66,8 @@ jobs:
         with:
           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          registry: ${{ secrets.REGISTRY }}
-          repo: vprofileapp
+          registry: ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com  # Directly using the registry URL
+          repo: ${{ env.ECR_REPOSITORY }}
           region: ${{ env.AWS_REGION }}
           tags: latest,${{ github.run_number }}
           daemon_off: false
