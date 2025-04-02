@@ -1,7 +1,7 @@
 name: vProfile CI/CD Pipeline
 
 on:
-  workflow_dispatch
+  workflow_dispatch:
   push:
     branches: [ main ]
   pull_request:
@@ -88,39 +88,4 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Install kubectl
-        uses: azure/setup-kubectl@v3
-
-      - name: Configure kubeconfig
-        run: |
-          aws eks update-kubeconfig \
-            --region ${{ env.AWS_REGION }} \
-            --name ${{ env.EKS_CLUSTER }}
-
-      - name: Install Helm
-        uses: azure/setup-helm@v3
-
-      - name: Create namespace if not exists
-        run: |
-          kubectl create namespace ${{ env.NAMESPACE }} --dry-run=client -o yaml | kubectl apply -f -
-
-      - name: Create ECR pull secret
-        run: |
-          kubectl create secret docker-registry ecr-credentials \
-            --namespace=${{ env.NAMESPACE }} \
-            --docker-server=${{ steps.login-ecr.outputs.registry }} \
-            --docker-username=AWS \
-            --docker-password=$(aws ecr get-login-password) \
-            --dry-run=client -o yaml | kubectl apply -f -
-
-      - name: Deploy using Helm
-        run: |
-          helm upgrade --install vprofile-app \
-            ${{ env.HELM_CHART_PATH }} \
-            --namespace ${{ env.NAMESPACE }} \
-            --set image.repository=${{ steps.build-image.outputs.image_uri }} \
-            --set image.tag=${{ github.run_number }} \
-            --atomic \
-            --wait
+          aws-region: ${{ env.AWS_REGION_
